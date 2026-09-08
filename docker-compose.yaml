@@ -1,0 +1,14 @@
+services:
+  registry:
+    image: registry:3
+    container_name: registry
+    restart: unless-stopped
+    ports:
+      - "8080:5000"
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+    volumes:
+      - ./registry_data:/var/lib/registry
+      - ./auth:/auth:ro
