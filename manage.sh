@@ -27,6 +27,19 @@ require_username() {
     printf '%s' "$username"
 }
 
+cmd_gen_certificates() {
+    CERTDIR="./certs/labadmin"
+    echo "$CERTDIR"
+    if [ -d "$CERTDIR" ]; then sudo rm -Rf "$CERTDIR"; fi
+    mkdir -p "$CERTDIR"
+    openssl genpkey -algorithm RSA -out "$CERTDIR/privkey.pem"
+    openssl req -new \
+        -key "$CERTDIR/privkey.pem" \
+        -out "$CERTDIR/cert.csr" \
+        -subj "/C=BR/ST=Goiás/L=Goiânia/O=linf/OU=linf/CN=linf/emailAddress=sinfgo.sptc@gmail.com"
+    openssl x509 -req -days 365 -in "$CERTDIR/cert.csr" -signkey "$CERTDIR/privkey.pem" -out "$CERTDIR/fullchain.pem"
+}
+
 create_user() {
     local username password confirmation entry temporary
     username="$(require_username "${1:-}")"
@@ -85,6 +98,9 @@ case "${1:-}" in
     restart)
         docker compose -f "$SCRIPT_DIR/docker-compose.yaml" restart registry
         ;;
+     gen-certificates)
+        cmd_gen_certificates
+    ;;
     *)
         usage
         exit 1

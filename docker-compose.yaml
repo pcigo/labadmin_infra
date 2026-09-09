@@ -3,12 +3,40 @@ services:
     image: registry:3
     container_name: registry
     restart: unless-stopped
-    ports:
-      - "8080:5000"
     environment:
       REGISTRY_AUTH: htpasswd
       REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
       REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
     volumes:
-      - ./registry_data:/var/lib/registry
+      - ${REGISTRY_DATA_PATH}:/var/lib/registry
       - ./auth:/auth:ro
+    ports:
+      - "8080:5000"
+    networks:
+    
+      - labadmin
+  nginx:
+    image: nginx:1.17-alpine
+    container_name: nginx
+    hostname: nginx
+    volumes:
+      - "${LABADMIN_STATIC_PATH}:/labadmin_static/"
+      - ./certs:/etc/nginx/certs
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    networks:
+      - labadmin
+
+networks:
+  labadmin:
+
+    driver: bridge

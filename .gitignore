@@ -1,2 +1,4 @@
 /auth/htpasswd
 registry_data/
+.certs/
+.env
