@@ -20,7 +20,6 @@ services:
     container_name: nginx
     hostname: nginx
     volumes:
-      - "${LABADMIN_STATIC_PATH}:/labadmin_static/"
       - ./certs:/etc/nginx/certs
       - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
     extra_hosts:
